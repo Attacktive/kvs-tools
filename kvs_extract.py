@@ -46,10 +46,10 @@ def find_all(a_str, sub):
 byte_str = b"".join(read_bytes(k_file))
 
 ext = ".kvs"
-files_start = list(find_all(byte_str, "KOVS"))
+files_start = list(find_all(byte_str, b"KOVS"))
 
 if not files_start:
-    files_start = list(find_all(byte_str, "KTSS"))
+    files_start = list(find_all(byte_str, b"KTSS"))
     ext = ".kns"
 
 last_offset = os.path.getsize(k_file) - 1
