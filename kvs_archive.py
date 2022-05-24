@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import glob
 import argparse
 
@@ -28,4 +29,5 @@ file_bytes = []
 for file in files:
     file_bytes.append(b"".join(read_bytes(file)))
 
-write_file("mod.ktsl2stbin")
+out_file_name = os.path.join(k_folder, "mod.ktsl2stbin")
+write_file(out_file_name)
