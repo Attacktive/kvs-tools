@@ -3,26 +3,12 @@
 import os
 import argparse
 
+from utils import read_bytes
+
 parser = argparse.ArgumentParser(description=".ktsl2stbin files extraction tool.")
 parser.add_argument("file", help=".ktsl2stbin file")
 args = parser.parse_args()
 k_file = args.file
-
-
-def read_bytes(file_name):
-    print("Reading file: " + file_name)
-    b_list = []
-
-    file_stream = open(file_name, "rb")
-    while True:
-        piece = file_stream.read(1024)
-        if not piece:
-            break
-
-        b_list.append(piece)
-    file_stream.close()
-
-    return b_list
 
 
 def write_file(name, start, end):

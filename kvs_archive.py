@@ -3,26 +3,12 @@
 import glob
 import argparse
 
+from utils import read_bytes
+
 parser = argparse.ArgumentParser(description="AOT2 .ktsl2stbin files archiving tool.")
 parser.add_argument("folder", help="folder with .kvs files")
 args = parser.parse_args()
 k_folder = args.folder
-
-
-def read_bytes(file_name):
-    print("Reading file: " + file_name)
-    b_list = []
-
-    file_stream = open(file_name, "rb")
-    while True:
-        piece = file_stream.read(1024)
-        if not piece:
-            break
-
-        b_list.append(piece)
-    file_stream.close()
-
-    return b_list
 
 
 def write_file(name):
