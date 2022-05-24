@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 import os
 import argparse
@@ -10,15 +9,16 @@ args = parser.parse_args()
 k_file = args.file
 
 
-def read_bytes(filename):
-    print("Reading file...")
+def read_bytes(file_name):
+    print("Reading file: " + file_name)
     b_list = []
 
-    file_stream = open(filename, "rb")
+    file_stream = open(file_name, "rb")
     while True:
         piece = file_stream.read(1024)
         if not piece:
             break
+
         b_list.append(piece)
     file_stream.close()
 
