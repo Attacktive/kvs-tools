@@ -14,7 +14,7 @@ def read_bytes(filename):
     print("Reading file...")
     b_list = []
 
-    f = open(filename, 'rb')
+    f = open(filename, "rb")
     while True:
         piece = f.read(1024)
         if not piece:
@@ -46,10 +46,10 @@ def find_all(a_str, sub):
 byte_str = b"".join(read_bytes(kfile))
 
 ext = ".kvs"
-files_start = list(find_all(byte_str, b'KOVS'))
+files_start = list(find_all(byte_str, "KOVS"))
 
 if not files_start:
-    files_start = list(find_all(byte_str, b'KTSS'))
+    files_start = list(find_all(byte_str, "KTSS"))
     ext = ".kns"
 
 last_offset = os.path.getsize(kfile) - 1
