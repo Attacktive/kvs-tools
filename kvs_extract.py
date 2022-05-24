@@ -3,7 +3,6 @@
 
 import os
 import argparse
-import mmap
 
 parser = argparse.ArgumentParser(description=".ktsl2stbin files extraction tool.")
 parser.add_argument("file", help=".ktsl2stbin file")
