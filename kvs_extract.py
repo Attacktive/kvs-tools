@@ -26,7 +26,7 @@ def read_bytes(filename):
 
 
 def write_file(name, start, end):
-    print("Writing file " + name)
+    print("Writing file: " + name)
     new_file_stream = open(name, "wb")
     new_file_stream.write(byte_str[start:end])
     new_file_stream.close()
@@ -58,11 +58,16 @@ out_directory_name = os.path.join(os.path.dirname(k_file), os.path.basename(k_fi
 os.makedirs(out_directory_name, exist_ok=True)
 
 size = len(files_start)
-print(size, "files")
+number_of_digits = len(str(size - 1))
+print(size, " files")
 
-for i in range(size - 1):
-    out_file_name = os.path.join(out_directory_name, (str(i) if i >= 10 else "0" + str(i)) + ext)
-    write_file(out_file_name, files_start[i], files_start[i + 1])
-else:
-    out_file_name = os.path.join(out_directory_name, str(size - 1) + ext)
-    write_file(out_file_name, files_start[-1], last_offset)
+for i in range(size):
+    file_index = str(i).rjust(number_of_digits, "0")
+    out_file_name = os.path.join(out_directory_name, file_index + ext)
+
+    if i == (size - 1):
+        offset = last_offset
+    else:
+        offset = files_start[i + 1]
+
+    write_file(out_file_name, files_start[i], offset)
