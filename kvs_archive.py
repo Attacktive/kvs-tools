@@ -6,13 +6,25 @@ import argparse
 
 from utils import read_bytes
 
-parser = argparse.ArgumentParser(description="AOT2 .ktsl2stbin files archiving tool.")
-parser.add_argument("folder", help="folder with .kvs files")
-args = parser.parse_args()
-k_folder = args.folder
+
+def main():
+    parser = argparse.ArgumentParser(description="AOT2 .ktsl2stbin files archiving tool.")
+    parser.add_argument("folder", help="folder with .kvs files")
+    args = parser.parse_args()
+    k_folder = args.folder
+
+    files = glob.glob(k_folder + "/*.[kK][vV][sS]")
+    file_bytes = get_bytes_from_files(files)
+
+    out_file_name = os.path.join(k_folder, "mod.ktsl2stbin")
+    write_file(out_file_name, file_bytes)
 
 
-def write_file(name):
+def get_bytes_from_files(files):
+    return map(lambda file: b"".join(read_bytes(file)), files)
+
+
+def write_file(name, file_bytes):
     print("Writing file " + name)
     # First 96 bytes (0x60)
     # This probably only works with AOT2 because the header might be different in each game
@@ -23,11 +35,4 @@ def write_file(name):
     new_file_stream.close()
 
 
-files = glob.glob(k_folder + "/*.[kK][vV][sS]")
-file_bytes = []
-
-for file in files:
-    file_bytes.append(b"".join(read_bytes(file)))
-
-out_file_name = os.path.join(k_folder, "mod.ktsl2stbin")
-write_file(out_file_name)
+main()
