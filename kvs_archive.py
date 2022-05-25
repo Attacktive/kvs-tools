@@ -35,4 +35,5 @@ def write_file(name, file_bytes):
     new_file_stream.close()
 
 
-main()
+if __name__ == "__main__":
+    main()

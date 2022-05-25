@@ -71,4 +71,5 @@ def find_all(byte_concatenation, sub):
         start += len(sub)
 
 
-main()
+if __name__ == "__main__":
+    main()
