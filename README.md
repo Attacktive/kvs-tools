@@ -1,4 +1,7 @@
 # kvs-tools
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d501c4203ff2407394ec823e61f39609)](https://app.codacy.com/gh/Attacktive/kvs-tools?utm_source=github.com&utm_medium=referral&utm_content=Attacktive/kvs-tools&utm_campaign=Badge_Grade_Settings)
+
 Tools for extracting and archiving koei-tecmo .ktsl2stbin files.
 
 ### kvs_extract.py
