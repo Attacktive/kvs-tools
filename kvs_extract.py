@@ -8,19 +8,11 @@ from archive_type import ArchiveType
 
 
 def main():
-    parser = argparse.ArgumentParser(description=".ktsl2stbin files extraction tool.")
-    parser.add_argument("file", help=".ktsl2stbin file")
-    args = parser.parse_args()
-    k_file = args.file
+    k_file, last_offset, out_directory_name = initialize()
 
     byte_concatenation = b"".join(read_bytes(k_file))
-    (archive_type, files_start) = get_archive_type_and_files_start(byte_concatenation)
-    extension = archive_type.extension
+    archive_type, files_start = get_archive_type_and_files_start(byte_concatenation)
 
-    last_offset = os.path.getsize(k_file) - 1
-
-    out_subdirectory_name = os.path.basename(k_file).split(".")[0]
-    out_directory_name = os.path.join(os.path.dirname(k_file), out_subdirectory_name)
     os.makedirs(out_directory_name, exist_ok=True)
 
     size = len(files_start)
@@ -29,14 +21,29 @@ def main():
 
     for i in range(size):
         file_index = str(i).rjust(number_of_digits, "0")
-        out_file_name = os.path.join(out_directory_name, file_index + extension)
+        out_file_name = os.path.join(out_directory_name, file_index + archive_type.extension)
 
         if i == (size - 1):
             offset = last_offset
         else:
             offset = files_start[i + 1]
 
-        write_file(out_file_name, byte_concatenation, files_start[i], offset)
+        write_to_file(out_file_name, byte_concatenation, files_start[i], offset)
+
+
+def initialize():
+    parser = argparse.ArgumentParser(description=".ktsl2stbin files extraction tool.")
+    parser.add_argument("file", help=".ktsl2stbin file")
+    args = parser.parse_args()
+
+    k_file = args.file
+
+    last_offset = os.path.getsize(k_file) - 1
+
+    out_subdirectory_name = os.path.basename(k_file).split(".")[0]
+    out_directory_name = os.path.join(os.path.dirname(k_file), out_subdirectory_name)
+
+    return k_file, last_offset, out_directory_name
 
 
 def get_archive_type_and_files_start(byte_concatenation):
@@ -53,9 +60,9 @@ def get_archive_type_and_files_start(byte_concatenation):
     return archive_type, files_start
 
 
-def write_file(name, byte_str, start, end):
-    print("Writing file: " + name)
-    new_file_stream = open(name, "wb")
+def write_to_file(file_name, byte_str, start, end):
+    print("Writing file: " + file_name)
+    new_file_stream = open(file_name, "wb")
     new_file_stream.write(byte_str[start:end])
     new_file_stream.close()
 
