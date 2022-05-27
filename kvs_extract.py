@@ -1,61 +1,82 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 import os
 import argparse
-import mmap
 
-parser = argparse.ArgumentParser(description=".ktsl2stbin files extraction tool.")
-parser.add_argument("file", help=".ktsl2stbin file")
-args = parser.parse_args()
-kfile = args.file
+from utils import read_bytes
+from archive_type import ArchiveType
 
-def read_bytes(filename):
-    print("Reading file...")
-    b_list = []
-    
-    f = open(filename, 'rb')
-    while True:
-        piece = f.read(1024)  
-        if not piece:
-            break
-        b_list.append(piece)
-    f.close()
 
-    return b_list
-    
-def write_file(name, start, end):
-    print("Writing file "+name)
-    new_file = open(name, "wb")
-    new_file.write(byte_str[start:end])
-    new_file.close()
-    
-def find_all(a_str, sub):
+def main():
+    k_file, last_offset, out_directory_name = initialize()
+
+    byte_concatenation = b"".join(read_bytes(k_file))
+    archive_type, files_start = get_archive_type_and_files_start(byte_concatenation)
+
+    os.makedirs(out_directory_name, exist_ok=True)
+
+    size = len(files_start)
+    number_of_digits = len(str(size - 1))
+    print(size, " files")
+
+    for i in range(size):
+        file_index = str(i).rjust(number_of_digits, "0")
+        out_file_name = os.path.join(out_directory_name, file_index + archive_type.extension)
+
+        if i == (size - 1):
+            offset = last_offset
+        else:
+            offset = files_start[i + 1]
+
+        write_to_file(out_file_name, byte_concatenation, files_start[i], offset)
+
+
+def initialize():
+    parser = argparse.ArgumentParser(description=".ktsl2stbin files extraction tool.")
+    parser.add_argument("file", help=".ktsl2stbin file")
+    args = parser.parse_args()
+
+    k_file = args.file
+
+    last_offset = os.path.getsize(k_file) - 1
+
+    out_subdirectory_name = os.path.basename(k_file).split(".")[0]
+    out_directory_name = os.path.join(os.path.dirname(k_file), out_subdirectory_name)
+
+    return k_file, last_offset, out_directory_name
+
+
+def get_archive_type_and_files_start(byte_concatenation):
+    files_start = list(find_all(byte_concatenation, ArchiveType.KOVS.signature))
+    if files_start:
+        archive_type = ArchiveType.KOVS
+    else:
+        files_start = list(find_all(byte_concatenation, ArchiveType.KTSS.signature))
+        archive_type = ArchiveType.KTSS
+
+    if not files_start:
+        raise "The input file is not recognized!"
+
+    return archive_type, files_start
+
+
+def write_to_file(file_name, byte_str, start, end):
+    print("Writing file: " + file_name)
+    new_file_stream = open(file_name, "wb")
+    new_file_stream.write(byte_str[start:end])
+    new_file_stream.close()
+
+
+def find_all(byte_concatenation, sub):
     start = 0
     while True:
-        start = a_str.find(sub, start)
-        if start == -1: return
+        start = byte_concatenation.find(sub, start)
+        if start == -1:
+            return
+
         yield start
         start += len(sub)
 
-byte_str = b"".join(read_bytes(kfile))
 
-ext = ".kvs"
-files_start = list(find_all(byte_str, b'KOVS'))
-
-if not files_start:
-    files_start = list(find_all(byte_str, b'KTSS'))
-    ext = ".kns"
-
-last_offset = os.path.getsize(kfile)-1
-
-out = os.path.join(os.path.dirname(kfile), os.path.basename(kfile).split(".")[0])
-os.makedirs(out, exist_ok=True)
-
-size = len(files_start)
-print(size, "files")
-
-for i in range(size-1):
-    write_file(os.path.join(out, (str(i) if i>=10 else "0"+str(i))+ext), files_start[i], files_start[i+1])
-else:
-    write_file(os.path.join(out, str(size-1)+ext), files_start[-1], last_offset)
+if __name__ == "__main__":
+    main()
